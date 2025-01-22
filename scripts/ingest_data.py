@@ -5,7 +5,6 @@ import pandas as pd
 from sqlalchemy import create_engine
 import psycopg2  # Added for database creation logic
 
-
 def main(parameters):
     user = parameters.user
     password = parameters.password
@@ -74,7 +73,6 @@ def main(parameters):
     df.to_sql(name=table_name, con=engine, if_exists='replace', index=False)
     print("Data ingestion complete.")
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Ingest data to Postgres')
 
@@ -84,7 +82,7 @@ if __name__ == '__main__':
     parser.add_argument('--port', help='Port for Postgres', required=True)
     parser.add_argument('--db', help='Database name for Postgres', required=True)
     parser.add_argument('--table_name', help='Name of the table to write results to', required=True)
-    parser.add_argument('--url', help='URL of the data file (CSV or Parquet)', required=True)
+    parser.add_argument('--url', help='URL of the file to ingest', required=True)
 
     args = parser.parse_args()
 

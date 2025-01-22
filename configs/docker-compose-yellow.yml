@@ -36,7 +36,7 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
 
-  taxi_ingest_yellow:
+  taxi-ingest-yellow:
     build:
       context: ..
       dockerfile: Dockerfile
@@ -48,7 +48,7 @@ services:
       - POSTGRES_HOST=pgdatabase
       - POSTGRES_PORT=5432
       - POSTGRES_DB=ny_taxi
-    command: >
+    command: 
       --user=postgres
       --password=postgres
       --host=pgdatabase
@@ -62,7 +62,6 @@ services:
     networks:
       - pg-network
     restart: "no"
-    profiles: ["tools"]
 
 networks:
   pg-network:

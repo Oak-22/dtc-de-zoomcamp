@@ -5,6 +5,6 @@ RUN pip install pandas sqlalchemy psycopg2-binary pyarrow
 
 WORKDIR /app
 
-COPY scripts/ingest_data_GPT.py ingest_data_GPT.py
+COPY scripts/ingest_data.py ingest_data.py
 
-ENTRYPOINT ["python", "ingest_data_GPT.py"]
+ENTRYPOINT ["python", "ingest_data.py"]
