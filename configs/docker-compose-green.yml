@@ -36,33 +36,32 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
 
-  taxi_ingest_green:
+  taxi-ingest-green:
     build:
       context: ..
       dockerfile: Dockerfile
     image: taxi-ingest-green:latest
     container_name: taxi-ingest-green
+    command:
+      - --user=postgres
+      - --password=postgres
+      - --host=pgdatabase
+      - --port=5432
+      - --db=ny_taxi
+      - --table_name=green_taxi_data
+      - --url=https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-10.csv.gz
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_HOST=pgdatabase
       - POSTGRES_PORT=5432
       - POSTGRES_DB=ny_taxi
-    command: >
-      --user=postgres
-      --password=postgres
-      --host=pgdatabase
-      --port=5432
-      --db=ny_taxi
-      --table_name=green_taxi_data
-      --url=https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-09.csv.gz
     depends_on:
       pgdatabase:
         condition: service_healthy
     networks:
       - pg-network
     restart: "no"
-    profiles: ["tools"]
 
 networks:
   pg-network:
