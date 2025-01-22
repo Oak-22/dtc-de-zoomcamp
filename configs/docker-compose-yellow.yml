@@ -1,0 +1,75 @@
+name: ny-taxi-data-pipeline
+
+services:
+  pgdatabase:
+    image: postgres:17-alpine
+    container_name: pg-database
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ny_taxi
+    volumes:
+      - vol-pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - pg-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    ports:
+      - "8080:80"
+    networks:
+      - pg-network
+    depends_on:
+      pgdatabase:
+        condition: service_healthy
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+  taxi_ingest_yellow:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: taxi-ingest-yellow:latest
+    container_name: taxi-ingest-yellow
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=pgdatabase
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=ny_taxi
+    command: >
+      --user=postgres
+      --password=postgres
+      --host=pgdatabase
+      --port=5432
+      --db=ny_taxi
+      --table_name=yellow_taxi_data
+      --url=https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2021-01.parquet
+    depends_on:
+      pgdatabase:
+        condition: service_healthy
+    networks:
+      - pg-network
+    restart: "no"
+    profiles: ["tools"]
+
+networks:
+  pg-network:
+    name: pg-network
+    driver: bridge
+    external: true
+
+volumes:
+  vol-pgdata:
+  pgadmin-data:
